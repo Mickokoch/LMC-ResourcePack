@@ -1,10 +1,10 @@
-name: .zip Pack Release
+name: Auto Release with Zip
 
 on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag ou version de la release (ex: v1.0.0)'
+        description: 'Nom du tag (ex: v1.0.3)'
         required: true
 
 jobs:
@@ -15,7 +15,24 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Create .ZIP archive
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+
+    - name: Create Tag
+      run: |
+        # Vérifie si le tag existe déjà à distance
+        if git ls-remote --tags origin | grep -q "refs/tags/${{ github.event.inputs.tag_name }}$"; then
+          echo "Le tag existe déjà. Abandon."
+          exit 1
+        fi
+
+        # Crée le tag localement
+        git tag ${{ github.event.inputs.tag_name }}
+        git push origin ${{ github.event.inputs.tag_name }}
+
+    - name: Create ZIP archive
       run: |
         mkdir release-folder
         cp -r assets pack.mcmeta pack.png readme.txt release-folder/
