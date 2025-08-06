@@ -12,8 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout repository with tags
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0   # Important pour récupérer tous les commits et tags
 
     - name: Setup authenticated remote
       run: git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
@@ -23,12 +25,15 @@ jobs:
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
 
-    - name: Create Tag
+    - name: Check if tag exists and create it
       run: |
+        echo "Vérification du tag ${{ github.event.inputs.tag_name }}..."
         if git ls-remote --tags origin | grep -q "refs/tags/${{ github.event.inputs.tag_name }}$"; then
           echo "❌ Le tag existe déjà. Abandon."
           exit 1
         fi
+
+        echo "Création du tag ${{ github.event.inputs.tag_name }}..."
         git tag ${{ github.event.inputs.tag_name }}
         git push origin ${{ github.event.inputs.tag_name }}
 
