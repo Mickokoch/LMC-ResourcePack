@@ -1,6 +1,5 @@
 name: .zip pack release
 
-
 on:
   workflow_dispatch:
     inputs:
@@ -8,7 +7,7 @@ on:
         description: 'Nom de la release (ex: LMC v1.0.3)'
         required: true
       tag_name:
-        description: 'Nom du tag (créé automatiquement, ex: v1.0.3)'
+        description: 'Nom du tag (ex: v1.0.3)'
         required: true
       prerelease:
         description: 'Est-ce une pre-release ?'
@@ -20,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Create ZIP archive
@@ -31,7 +30,7 @@ jobs:
         zip -r "../LMC-${{ github.event.inputs.tag_name }}.zip" ./*
         cd ..
 
-    - name: Create GitHub Release (without local git tag)
+    - name: Create GitHub Release with PAT
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.event.inputs.tag_name }}
@@ -39,4 +38,4 @@ jobs:
         prerelease: ${{ github.event.inputs.prerelease }}
         files: LMC-${{ github.event.inputs.tag_name }}.zip
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
