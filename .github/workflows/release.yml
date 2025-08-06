@@ -18,7 +18,7 @@ jobs:
     - name: Create ZIP archive
       run: |
         mkdir release-folder
-        cp -r src docs README.md release-folder/
+        cp -r assets pack.mcmeta pack.png readme.txt release-folder/
         cd release-folder
         zip -r ../release.zip ./*
         cd ..
