@@ -1,4 +1,4 @@
-name: Auto Release with Zip
+name: .zip Pack release
 
 on:
   workflow_dispatch:
@@ -15,6 +15,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Authenticate Git with PAT
+      run: git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
+
     - name: Configure Git
       run: |
         git config user.name "github-actions"
@@ -22,13 +25,10 @@ jobs:
 
     - name: Create Tag
       run: |
-        # Vérifie si le tag existe déjà à distance
         if git ls-remote --tags origin | grep -q "refs/tags/${{ github.event.inputs.tag_name }}$"; then
-          echo "Le tag existe déjà. Abandon."
+          echo "❌ Le tag existe déjà. Abandon."
           exit 1
         fi
-
-        # Crée le tag localement
         git tag ${{ github.event.inputs.tag_name }}
         git push origin ${{ github.event.inputs.tag_name }}
 
@@ -47,4 +47,5 @@ jobs:
         files: release.zip
         prerelease: ${{ github.event.inputs.prerelease }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
