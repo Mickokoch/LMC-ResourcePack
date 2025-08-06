@@ -1,55 +1,42 @@
 name: .zip pack release
 
+
 on:
   workflow_dispatch:
     inputs:
-      tag_name:
-        description: 'Nom du tag (ex: v1.0.3)'
+      release_name:
+        description: 'Nom de la release (ex: LMC v1.0.3)'
         required: true
+      tag_name:
+        description: 'Nom du tag (créé automatiquement, ex: v1.0.3)'
+        required: true
+      prerelease:
+        description: 'Est-ce une pre-release ?'
+        required: false
+        default: 'false'
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository with tags
+    - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0   # Important pour récupérer tous les commits et tags
-
-    - name: Setup authenticated remote
-      run: git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
-
-    - name: Configure Git
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-
-    - name: Check if tag exists and create it
-      run: |
-        echo "Vérification du tag ${{ github.event.inputs.tag_name }}..."
-        if git ls-remote --tags origin | grep -q "refs/tags/${{ github.event.inputs.tag_name }}$"; then
-          echo "❌ Le tag existe déjà. Abandon."
-          exit 1
-        fi
-
-        echo "Création du tag ${{ github.event.inputs.tag_name }}..."
-        git tag ${{ github.event.inputs.tag_name }}
-        git push origin ${{ github.event.inputs.tag_name }}
 
     - name: Create ZIP archive
       run: |
         mkdir release-folder
         cp -r assets pack.mcmeta pack.png readme.txt release-folder/
         cd release-folder
-        zip -r ../release.zip ./*
+        zip -r "../LMC-${{ github.event.inputs.tag_name }}.zip" ./*
         cd ..
 
-    - name: Create GitHub Release
+    - name: Create GitHub Release (without local git tag)
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.event.inputs.tag_name }}
-        files: release.zip
+        name: ${{ github.event.inputs.release_name }}
         prerelease: ${{ github.event.inputs.prerelease }}
+        files: LMC-${{ github.event.inputs.tag_name }}.zip
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
