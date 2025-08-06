@@ -1,0 +1,7 @@
+{
+  "pack": {
+    "description": "Jussieu resource pack",
+    "pack_format": 63,
+    "supported_formats": [34, 46, 63, 64]
+  }
+}
