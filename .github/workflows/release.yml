@@ -4,15 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       release_name:
-        description: 'Nom de la release (ex: LMC v1.0.3)'
+        description: 'Nom de la release (ex: ouaf v1.0.3)'
         required: true
       tag_name:
         description: 'Nom du tag (ex: v1.0.3)'
         required: true
-      prerelease:
-        description: 'Est-ce une pre-release ?'
-        required: false
-        default: 'false'
 
 jobs:
   release:
