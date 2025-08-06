@@ -15,7 +15,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Create ZIP archive
+    - name: Create .ZIP archive
       run: |
         mkdir release-folder
         cp -r assets pack.mcmeta pack.png readme.txt release-folder/
